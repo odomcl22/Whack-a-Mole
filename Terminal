@@ -1,0 +1,8 @@
+# Create the project directory
+mkdir weather-dashboard
+
+# Navigate into the project directory
+cd weather-dashboard
+
+# Create the necessary files
+touch index.html styles.css script.js
