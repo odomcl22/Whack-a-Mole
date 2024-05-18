@@ -10,10 +10,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let moleTimerId;
     let customMoleImage = '';
 
+    // Use a simple beep sound for the click event
+    const clickSound = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=');
+
     function randomHole() {
         holes.forEach(hole => {
             hole.classList.remove('active');
-            // Remove any existing image
+            hole.classList.remove('hit');
             const img = hole.querySelector('img');
             if (img) {
                 hole.removeChild(img);
@@ -22,7 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const randomHole = holes[Math.floor(Math.random() * holes.length)];
         randomHole.classList.add('active');
 
-        // Add custom mole image if available
         if (customMoleImage) {
             const img = document.createElement('img');
             img.src = customMoleImage;
@@ -30,9 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
             img.style.height = '100%';
             img.style.objectFit = 'cover';
             randomHole.appendChild(img);
-            randomHole.classList.remove('default-mole');
-        } else {
-            randomHole.classList.add('default-mole');
         }
     }
 
@@ -61,12 +60,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 score++;
                 scoreDisplay.textContent = score;
                 hole.classList.remove('active');
+                hole.classList.add('hit');
+                clickSound.play(); // Play sound on click
             }
         };
 
         hole.addEventListener('click', hitMole);
-
-        // Add touch event listener for mobile devices
         hole.addEventListener('touchstart', hitMole);
     });
 
@@ -78,8 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const reader = new FileReader();
             reader.onload = (e) => {
                 customMoleImage = e.target.result;
-                // Debugging: Ensure the custom image data URL is correct
-                console.log('Custom Mole Image:', customMoleImage);
+                console.log('Custom Mole Image Loaded:', customMoleImage); // Debugging
             };
             reader.readAsDataURL(file);
         }
