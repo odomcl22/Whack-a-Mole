@@ -78,6 +78,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const reader = new FileReader();
             reader.onload = (e) => {
                 customMoleImage = e.target.result;
+                // Debugging: Ensure the custom image data URL is correct
+                console.log('Custom Mole Image:', customMoleImage);
             };
             reader.readAsDataURL(file);
         }
