@@ -1,78 +1,111 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-}
+document.addEventListener('DOMContentLoaded', () => {
+    const holes = document.querySelectorAll('.hole');
+    const scoreDisplay = document.getElementById('score');
+    const timeLeftDisplay = document.getElementById('timeLeft');
+    const startButton = document.getElementById('startButton');
+    const uploadDefaultImageInput = document.getElementById('uploadDefaultImage');
+    const uploadClickedImageInput = document.getElementById('uploadClickedImage');
+    let score = 0;
+    let timeLeft = 30;
+    let timerId;
+    let moleTimerId;
+    let defaultMoleImage = '';
+    let clickedMoleImage = '';
 
-.game-container {
-    text-align: center;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
+    // Use a simple beep sound for the click event
+    const clickSound = new Audio('https://www.soundjay.com/button/beep-07.wav');
 
-.grid {
-    display: grid;
-    grid-template-columns: repeat(3, 100px);
-    grid-gap: 10px;
-    justify-content: center;
-    margin: 20px 0;
-}
+    function randomHole() {
+        holes.forEach(hole => {
+            hole.classList.remove('active');
+            hole.classList.remove('hit');
+            const imgDefault = hole.querySelector('img.default');
+            const imgClicked = hole.querySelector('img.clicked');
+            if (imgDefault) {
+                hole.removeChild(imgDefault);
+            }
+            if (imgClicked) {
+                hole.removeChild(imgClicked);
+            }
+        });
+        const randomHole = holes[Math.floor(Math.random() * holes.length)];
+        randomHole.classList.add('active');
 
-.hole {
-    width: 100px;
-    height: 100px;
-    background-color: #ccc;
-    position: relative;
-}
+        if (defaultMoleImage) {
+            const imgDefault = document.createElement('img');
+            imgDefault.src = defaultMoleImage;
+            imgDefault.classList.add('default');
+            randomHole.appendChild(imgDefault);
 
-.hole.active img.default {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
+            const imgClicked = document.createElement('img');
+            imgClicked.src = clickedMoleImage;
+            imgClicked.classList.add('clicked');
+            randomHole.appendChild(imgClicked);
+        }
+    }
 
-.hole img.default {
-    display: none;
-}
+    function startGame() {
+        score = 0;
+        timeLeft = 30;
+        scoreDisplay.textContent = score;
+        timeLeftDisplay.textContent = timeLeft;
+        timerId = setInterval(countDown, 1000);
+        moleTimerId = setInterval(randomHole, 800);
+    }
 
-.hole img.clicked {
-    display: none;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
+    function countDown() {
+        timeLeft--;
+        timeLeftDisplay.textContent = timeLeft;
+        if (timeLeft === 0) {
+            clearInterval(timerId);
+            clearInterval(moleTimerId);
+            alert('Game over! Your score is ' + score);
+        }
+    }
 
-.hole.hit img.clicked {
-    display: block;
-}
+    holes.forEach(hole => {
+        const hitMole = () => {
+            if (hole.classList.contains('active')) {
+                score++;
+                scoreDisplay.textContent = score;
+                hole.classList.remove('active');
+                hole.classList.add('hit');
+                clickSound.play(); // Play sound on click
 
-@keyframes hitAnimation {
-    0% { transform: scale(1) rotate(0deg); }
-    50% { transform: scale(1.2) rotate(10deg); }
-    100% { transform: scale(1) rotate(0deg); }
-}
+                // Delay the removal of the hit state by 0.5 seconds
+                setTimeout(() => {
+                    hole.classList.remove('hit');
+                }, 500);
+            }
+        };
 
-.hole.hit img.clicked {
-    animation: hitAnimation 0.3s ease-in-out;
-}
+        hole.addEventListener('click', hitMole);
+        hole.addEventListener('touchstart', hitMole);
+    });
 
-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
+    startButton.addEventListener('click', startGame);
 
-button:hover {
-    background-color: #0056b3;
-}
+    uploadDefaultImageInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                defaultMoleImage = e.target.result;
+                console.log('Default Mole Image Loaded:', defaultMoleImage); // Debugging
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    uploadClickedImageInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                clickedMoleImage = e.target.result;
+                console.log('Clicked Mole Image Loaded:', clickedMoleImage); // Debugging
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+});
