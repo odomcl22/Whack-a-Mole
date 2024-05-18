@@ -1,85 +1,78 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const holes = document.querySelectorAll('.hole');
-    const scoreDisplay = document.getElementById('score');
-    const timeLeftDisplay = document.getElementById('timeLeft');
-    const startButton = document.getElementById('startButton');
-    const uploadImageInput = document.getElementById('uploadImage');
-    let score = 0;
-    let timeLeft = 30;
-    let timerId;
-    let moleTimerId;
-    let customMoleImage = '';
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
 
-    // Use a simple beep sound for the click event
-    const clickSound = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=');
+.game-container {
+    text-align: center;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
 
-    function randomHole() {
-        holes.forEach(hole => {
-            hole.classList.remove('active');
-            hole.classList.remove('hit');
-            const img = hole.querySelector('img');
-            if (img) {
-                hole.removeChild(img);
-            }
-        });
-        const randomHole = holes[Math.floor(Math.random() * holes.length)];
-        randomHole.classList.add('active');
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-gap: 10px;
+    justify-content: center;
+    margin: 20px 0;
+}
 
-        if (customMoleImage) {
-            const img = document.createElement('img');
-            img.src = customMoleImage;
-            img.style.width = '100%';
-            img.style.height = '100%';
-            img.style.objectFit = 'cover';
-            randomHole.appendChild(img);
-        }
-    }
+.hole {
+    width: 100px;
+    height: 100px;
+    background-color: #ccc;
+    position: relative;
+}
 
-    function startGame() {
-        score = 0;
-        timeLeft = 30;
-        scoreDisplay.textContent = score;
-        timeLeftDisplay.textContent = timeLeft;
-        timerId = setInterval(countDown, 1000);
-        moleTimerId = setInterval(randomHole, 800);
-    }
+.hole.active img.default {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 
-    function countDown() {
-        timeLeft--;
-        timeLeftDisplay.textContent = timeLeft;
-        if (timeLeft === 0) {
-            clearInterval(timerId);
-            clearInterval(moleTimerId);
-            alert('Game over! Your score is ' + score);
-        }
-    }
+.hole img.default {
+    display: none;
+}
 
-    holes.forEach(hole => {
-        const hitMole = () => {
-            if (hole.classList.contains('active')) {
-                score++;
-                scoreDisplay.textContent = score;
-                hole.classList.remove('active');
-                hole.classList.add('hit');
-                clickSound.play(); // Play sound on click
-            }
-        };
+.hole img.clicked {
+    display: none;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 
-        hole.addEventListener('click', hitMole);
-        hole.addEventListener('touchstart', hitMole);
-    });
+.hole.hit img.clicked {
+    display: block;
+}
 
-    startButton.addEventListener('click', startGame);
+@keyframes hitAnimation {
+    0% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.2) rotate(10deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
 
-    uploadImageInput.addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                customMoleImage = e.target.result;
-                console.log('Custom Mole Image Loaded:', customMoleImage); // Debugging
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-});
+.hole.hit img.clicked {
+    animation: hitAnimation 0.3s ease-in-out;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
