@@ -11,18 +11,28 @@ document.addEventListener('DOMContentLoaded', () => {
     let customMoleImage = '';
 
     function randomHole() {
-        holes.forEach(hole => hole.classList.remove('active'));
+        holes.forEach(hole => {
+            hole.classList.remove('active');
+            // Remove any existing image
+            const img = hole.querySelector('img');
+            if (img) {
+                hole.removeChild(img);
+            }
+        });
         const randomHole = holes[Math.floor(Math.random() * holes.length)];
         randomHole.classList.add('active');
-
-        // Remove any previously appended image
-        randomHole.querySelectorAll('img').forEach(img => img.remove());
 
         // Add custom mole image if available
         if (customMoleImage) {
             const img = document.createElement('img');
             img.src = customMoleImage;
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
             randomHole.appendChild(img);
+            randomHole.classList.remove('default-mole');
+        } else {
+            randomHole.classList.add('default-mole');
         }
     }
 
